@@ -5,6 +5,11 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
 
+/**
+ * Classe de conveniência que recebe um OutputStream e um InputStream e
+ * disponibiliza métodos para que se possa interagir com o usuário com
+ * mais eficiência de código.
+ */
 public class PrintStreamScanner {
 
     private final PrintStream consoleOut;
@@ -35,6 +40,13 @@ public class PrintStreamScanner {
         consoleOut.println();
     }
 
+    /**
+     * Pede para que o usuário digite um texto e retorna o texto digitado.
+     *
+     * @param msg mensagem pedindo para digitar algo
+     * @param fb valor de fallback (default)
+     * @return o texto digitado
+     */
     public String getString(String msg, Object fb) {
         String value;
         do {
@@ -51,6 +63,12 @@ public class PrintStreamScanner {
         return value;
     }
 
+    /**
+     * Pede para que o usuário digite sim ou nao e retorna o boolean correspondente.
+     *
+     * @param msg mensagem pedindo para digitar algo
+     * @return o boolean correspondente
+     */
     public boolean getSimNao(String msg) {
         Boolean bValue = null;
         do {
@@ -64,6 +82,13 @@ public class PrintStreamScanner {
         return bValue;
     }
 
+    /**
+     * Pede para que o usuário digite um número positivo e retorna o número digitado.
+     *
+     * @param msg mensagem pedindo para digitar algo
+     * @param fb valor de fallback (default)
+     * @return o número digitado
+     */
     public Integer getPositiveInt(String msg, Integer fb) {
         Integer value = null;
         do {

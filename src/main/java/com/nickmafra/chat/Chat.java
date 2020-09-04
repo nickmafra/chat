@@ -26,7 +26,7 @@ public class Chat {
     public void start() {
         console.println("Bem vindo ao chat.");
         try {
-            isHost = console.getSimNao("Deseja ser hospedeiro (sim/nao)? ");
+            isHost = console.getSimNao("Diga se deseja ser o hospedeiro (sim/nao)");
             if (isHost) {
                 esperarConexao();
             } else {
