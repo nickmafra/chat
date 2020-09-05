@@ -2,6 +2,8 @@ package com.nickmafra.chat;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.function.Consumer;
 
 public class JanelaChat {
 
@@ -11,12 +13,15 @@ public class JanelaChat {
     private int width = 400;
     private int height = 600;
 
+    private Consumer<String> consumerTextoDigitado;
+
     public JanelaChat() {
         frame = new JFrame("Chat");
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         textoSaida = createTextoSaida();
-        textoSaida.setText("Bem vindo ao chat\nAinda sem comportamento");
+        textoSaida.setText("Bem vindo ao chat\n");
         textoEntrada = new JTextField();
+        textoEntrada.setAction(new ActionPerformed(this::onEnter));
         JPanel panel = createPanel(textoSaida, textoEntrada);
         frame.add(panel);
     }
@@ -41,12 +46,33 @@ public class JanelaChat {
         return frame;
     }
 
+    public synchronized void setConsumerTextoDigitado(Consumer<String> consumerTextoDigitado) {
+        this.consumerTextoDigitado = consumerTextoDigitado;
+    }
+
     public void start() {
         frame.setSize(width, height);
         frame.setVisible(true);
     }
 
+    private synchronized void onEnter(ActionEvent e) {
+        if (consumerTextoDigitado != null) {
+            consumerTextoDigitado.accept(textoEntrada.getText());
+            textoEntrada.setText("");
+        }
+    }
+
+    public synchronized void print(String text) {
+        textoSaida.setText(textoSaida.getText() + text);
+    }
+
+    public void println(String text) {
+        print(text + "\n");
+    }
+
     public static void main(String[] args) {
-        new JanelaChat().start();
+        JanelaChat janelaChat = new JanelaChat();
+        janelaChat.setConsumerTextoDigitado(janelaChat::println);
+        janelaChat.start();
     }
 }
