@@ -15,6 +15,7 @@ public class Chat {
 
     private boolean isHost;
     private int port;
+    private final String comandoSair = "sair";
 
     public Chat(OutputStream out, InputStream in) {
         this.consolePss = new PrintStreamScanner(out, in);
@@ -30,8 +31,11 @@ public class Chat {
                 conectar();
             }
             conversar();
+        } catch (InterruptedException e) {
+            consolePss.println("Voce interrompeu a conexao.");
+            Thread.currentThread().interrupt();
         } catch (InterruptedIOException e) {
-            consolePss.println("Conexao interrompida.");
+            consolePss.println("A outra pessoa interrompeu a conexao.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,8 +62,8 @@ public class Chat {
         socketPss = new PrintStreamScanner(socket);
     }
 
-    private void conversar() throws InterruptedIOException {
-        consolePss.println("---Inicio da conversa---");
+    private void conversar() throws InterruptedIOException, InterruptedException {
+        consolePss.println("---Inicio da conversa (digite '" + comandoSair + "' para sair)---");
         while (!Thread.currentThread().isInterrupted()) {
             if (isHost) {
                 enviar();
@@ -71,9 +75,12 @@ public class Chat {
         }
     }
 
-    private void enviar() {
+    private void enviar() throws InterruptedException {
         consolePss.println();
         String textoOut = consolePss.getString(textoPessoaMensagem(true), null);
+        if (textoOut.equalsIgnoreCase(comandoSair)) {
+            throw new InterruptedException();
+        }
         socketPss.println(textoOut);
     }
 
