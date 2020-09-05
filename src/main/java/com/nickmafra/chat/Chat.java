@@ -30,6 +30,7 @@ public class Chat {
             } else {
                 conectar();
             }
+            exibirInstrucoes();
             conversar();
         } catch (InterruptedException e) {
             consolePss.println("Voce interrompeu a conexao.");
@@ -62,8 +63,15 @@ public class Chat {
         socketPss = new PrintStreamScanner(socket);
     }
 
+    private void exibirInstrucoes() {
+        consolePss.println();
+        consolePss.println("Para sair, digite '" + comandoSair + "'");
+        consolePss.println("Quando nao for sua vez de digitar, espere.");
+    }
+
     private void conversar() throws InterruptedIOException, InterruptedException {
-        consolePss.println("---Inicio da conversa (digite '" + comandoSair + "' para sair)---");
+        consolePss.println();
+        consolePss.println("--- Inicio da conversa ---");
         while (!Thread.currentThread().isInterrupted()) {
             if (isHost) {
                 enviar();
@@ -85,16 +93,15 @@ public class Chat {
     }
 
     private void receber() throws InterruptedIOException {
-        consolePss.print("Aguarde a outra pessoa digitar...");
+        consolePss.println();
         String textoIn;
         try {
+            consolePss.print(textoPessoaMensagem(false) + ": ");
             textoIn = socketPss.nextLine();
         } catch (NoSuchElementException e) {
             throw new InterruptedIOException();
-        } finally {
-            consolePss.println("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
         }
-        consolePss.println(textoPessoaMensagem(false) + ": " + textoIn);
+        consolePss.println(textoIn);
     }
 
     private String textoPessoaMensagem(boolean isEnvio) {
