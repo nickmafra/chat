@@ -15,14 +15,13 @@ public class AsyncChat {
 
     private boolean isHost;
     private int port;
-    private final String comandoSair = "sair";
+    private ServerSocket serverSocket;
 
     public AsyncChat(OutputStream out, InputStream in) {
         consolePss = new PrintStreamScanner(out, in);
     }
 
     public void start() {
-        consolePss.println("Iniciando chat...");
         try {
             consolePss.setPrintValorDigitado(true);
             isHost = consolePss.getSimNao("Diga se deseja ser o hospedeiro (sim/nao)");
@@ -41,7 +40,7 @@ public class AsyncChat {
     private void esperarConexao() throws IOException {
         consolePss.setPrintValorDigitado(true);
         port = consolePss.getPositiveInt("Digite a porta", 8029);
-        ServerSocket serverSocket = new ServerSocket(port);
+        serverSocket = new ServerSocket(port);
         consolePss.println("Esperando cliente conectar...");
         Socket socket = serverSocket.accept();
         setupConexao(socket);
@@ -63,8 +62,7 @@ public class AsyncChat {
 
     private void exibirInstrucoes() {
         consolePss.println();
-        consolePss.println("Para sair, digite '" + comandoSair + "'");
-        consolePss.println("Quando nao for sua vez de digitar, espere.");
+        consolePss.println("Aproveite!");
     }
 
     private void conversar() {
@@ -77,34 +75,46 @@ public class AsyncChat {
     }
 
     private void manterEnviando() {
-        while (!Thread.currentThread().isInterrupted()) {
-            try {
+        try {
+            while (!Thread.currentThread().isInterrupted())
                 enviar();
-            } catch (InterruptedException e) {
-                consolePss.println("Voce interrompeu a conexao.");
-                Thread.currentThread().interrupt();
+        } finally {
+            try {
+                socketPss.getOut().close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
     private void manterRecebendo() {
-        while (!Thread.currentThread().isInterrupted()) {
-            try {
+        try {
+            while (!Thread.currentThread().isInterrupted()) {
                 receber();
-            } catch (InterruptedIOException e) {
-                consolePss.println("A outra pessoa interrompeu a conexao.");
-                Thread.currentThread().interrupt();
+            }
+        } catch (InterruptedIOException e) {
+            consolePss.println("A outra pessoa interrompeu a conexao.");
+            Thread.currentThread().interrupt();
+        } finally {
+            try {
+                socketPss.getIn().close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (serverSocket != null) {
+                try {
+                    serverSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
-    private void enviar() throws InterruptedException {
+    private void enviar() {
         consolePss.println();
         consolePss.setPrintValorDigitado(false);
         String textoOut = consolePss.getString(null, null);
-        if (textoOut.equalsIgnoreCase(comandoSair)) {
-            throw new InterruptedException();
-        }
         socketPss.println(textoOut);
         consolePss.println(textoPessoaMensagem(true) + ": " + textoOut);
     }

@@ -3,7 +3,7 @@ package com.nickmafra.chat;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class JanelaAsyncChat {
+public class JanelaAsyncChatMain {
 
     public static void main(String[] args) throws IOException {
         JanelaChat janelaChat = new JanelaChat();
