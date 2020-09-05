@@ -31,7 +31,7 @@ public class Chat {
             }
             conversar();
         } catch (InterruptedIOException e) {
-            consolePss.println("Conexão interrompida.");
+            consolePss.println("Conexao interrompida.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -46,7 +46,7 @@ public class Chat {
     }
 
     private void conectar() throws IOException {
-        String hostname = consolePss.getString("Digite o endereço", "localhost");
+        String hostname = consolePss.getString("Digite o endereco", "localhost");
         port = consolePss.getPositiveInt("Digite a porta", 8029);
         consolePss.println("Conectando com o servidor...");
         Socket socket = new Socket(hostname, port);
@@ -59,7 +59,7 @@ public class Chat {
     }
 
     private void conversar() throws InterruptedIOException {
-        consolePss.println("---Início da conversa---");
+        consolePss.println("---Inicio da conversa---");
         while (!Thread.currentThread().isInterrupted()) {
             if (isHost) {
                 enviar();
@@ -92,7 +92,7 @@ public class Chat {
 
     private String textoPessoaMensagem(boolean isEnvio) {
         return (isEnvio == isHost ? "- Hospedeiro" : "- Cliente")
-                + (isEnvio ? " (você)" : "");
+                + (isEnvio ? " (voce)" : "");
     }
 
     public static void main(String[] args) {
