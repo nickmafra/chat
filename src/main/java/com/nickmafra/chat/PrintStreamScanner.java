@@ -1,8 +1,10 @@
 package com.nickmafra.chat;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.Socket;
 import java.util.Scanner;
 
 /**
@@ -12,32 +14,48 @@ import java.util.Scanner;
  */
 public class PrintStreamScanner {
 
-    private final PrintStream consoleOut;
-    private final Scanner consoleIn;
+    private final OutputStream out;
+    private final InputStream in;
+    private final PrintStream print;
+    private final Scanner scanner;
 
     public PrintStreamScanner(OutputStream out, InputStream in) {
-        this.consoleOut = new PrintStream(out);
-        this.consoleIn = new Scanner(in);
+        this.out = out;
+        this.in = in;
+        this.print = new PrintStream(out);
+        this.scanner = new Scanner(in);
     }
 
-    public PrintStream getConsoleOut() {
-        return consoleOut;
+    public PrintStreamScanner(Socket socket) throws IOException {
+        this(socket.getOutputStream(), socket.getInputStream());
     }
 
-    public Scanner getConsoleIn() {
-        return consoleIn;
+    public OutputStream getOut() {
+        return out;
+    }
+
+    public InputStream getIn() {
+        return in;
+    }
+
+    public PrintStream getPrint() {
+        return print;
+    }
+
+    public Scanner getScanner() {
+        return scanner;
     }
 
     public void print(Object obj) {
-        consoleOut.print(obj);
+        print.print(obj);
     }
 
     public void println(Object obj) {
-        consoleOut.println(obj);
+        print.println(obj);
     }
 
     public void println() {
-        consoleOut.println();
+        print.println();
     }
 
     /**
@@ -50,12 +68,12 @@ public class PrintStreamScanner {
     public String getString(String msg, Object fb) {
         String value;
         do {
-            consoleOut.print(msg);
+            print.print(msg);
             if (fb != null) {
-                consoleOut.print(" (" + fb + ")");
+                print.print(" (" + fb + ")");
             }
-            consoleOut.print(": ");
-            value = consoleIn.nextLine();
+            print.print(": ");
+            value = scanner.nextLine();
             if (fb != null && value.isEmpty()) {
                 value = fb.toString();
             }
@@ -96,13 +114,17 @@ public class PrintStreamScanner {
             try {
                 value = Integer.parseInt(strValue);
             } catch (NumberFormatException e) {
-                consoleOut.println("Número inválido.");
+                print.println("Número inválido.");
             }
             if (value != null && value <= 0) {
-                consoleOut.println("Número deve ser maior que zero.");
+                print.println("Número deve ser maior que zero.");
                 value = null;
             }
         } while (value == null);
         return value;
+    }
+
+    public String nextLine() {
+        return scanner.nextLine();
     }
 }

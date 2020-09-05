@@ -1,30 +1,29 @@
 package com.nickmafra.chat;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InterruptedIOException;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.NoSuchElementException;
-import java.util.Scanner;
 
 public class Chat {
 
-    private final PrintStreamScanner console;
+    private final PrintStreamScanner consolePss;
+    private PrintStreamScanner socketPss;
 
     private boolean isHost;
     private int port;
-    private Socket socket;
-
-    private PrintStream socketOut;
-    private Scanner socketIn;
 
     public Chat(OutputStream out, InputStream in) {
-        this.console = new PrintStreamScanner(out, in);
+        this.consolePss = new PrintStreamScanner(out, in);
     }
 
     public void start() {
-        console.println("Bem vindo ao chat.");
+        consolePss.println("Bem vindo ao chat.");
         try {
-            isHost = console.getSimNao("Diga se deseja ser o hospedeiro (sim/nao)");
+            isHost = consolePss.getSimNao("Diga se deseja ser o hospedeiro (sim/nao)");
             if (isHost) {
                 esperarConexao();
             } else {
@@ -32,36 +31,35 @@ public class Chat {
             }
             conversar();
         } catch (InterruptedIOException e) {
-            console.println("Conexão interrompida.");
+            consolePss.println("Conexão interrompida.");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private void esperarConexao() throws IOException {
-        port = console.getPositiveInt("Digite a porta", 8029);
+        port = consolePss.getPositiveInt("Digite a porta", 8029);
         ServerSocket serverSocket = new ServerSocket(port);
-        console.println("Esperando cliente conectar...");
-        socket = serverSocket.accept();
-        setupConexao();
+        consolePss.println("Esperando cliente conectar...");
+        Socket socket = serverSocket.accept();
+        setupConexao(socket);
     }
 
     private void conectar() throws IOException {
-        String hostname = console.getString("Digite o endereço", "localhost");
-        port = console.getPositiveInt("Digite a porta", 8029);
-        console.println("Esperando servidor aceitar...");
-        socket = new Socket(hostname, port);
-        setupConexao();
+        String hostname = consolePss.getString("Digite o endereço", "localhost");
+        port = consolePss.getPositiveInt("Digite a porta", 8029);
+        consolePss.println("Conectando com o servidor...");
+        Socket socket = new Socket(hostname, port);
+        setupConexao(socket);
     }
 
-    private void setupConexao() throws IOException {
-        console.println("Conectado com: " + socket.getRemoteSocketAddress());
-        socketIn = new Scanner(socket.getInputStream());
-        socketOut = new PrintStream(socket.getOutputStream());
+    private void setupConexao(Socket socket) throws IOException {
+        consolePss.println("Conectado com: " + socket.getRemoteSocketAddress());
+        socketPss = new PrintStreamScanner(socket);
     }
 
     private void conversar() throws InterruptedIOException {
-        console.println("---Início da conversa---");
+        consolePss.println("---Início da conversa---");
         while (!Thread.currentThread().isInterrupted()) {
             if (isHost) {
                 enviar();
@@ -74,21 +72,27 @@ public class Chat {
     }
 
     private void enviar() {
-        console.println();
-        String textoOut = console.getString("- Você", null);
-        socketOut.println(textoOut);
+        consolePss.println();
+        String textoOut = consolePss.getString(textoPessoaMensagem(true), null);
+        socketPss.println(textoOut);
     }
 
     private void receber() throws InterruptedIOException {
-        console.println();
-        console.println("Aguarde a outra pessoa digitar...");
+        consolePss.print("Aguarde a outra pessoa digitar...");
         String textoIn;
         try {
-            textoIn = socketIn.nextLine();
+            textoIn = socketPss.nextLine();
         } catch (NoSuchElementException e) {
             throw new InterruptedIOException();
+        } finally {
+            consolePss.println("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
         }
-        console.println("- Fulano: " + textoIn);
+        consolePss.println(textoPessoaMensagem(false) + ": " + textoIn);
+    }
+
+    private String textoPessoaMensagem(boolean isEnvio) {
+        return (isEnvio == isHost ? "- Hospedeiro" : "- Cliente")
+                + (isEnvio ? " (você)" : "");
     }
 
     public static void main(String[] args) {
