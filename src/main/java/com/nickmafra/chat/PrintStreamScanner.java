@@ -114,10 +114,10 @@ public class PrintStreamScanner {
             try {
                 value = Integer.parseInt(strValue);
             } catch (NumberFormatException e) {
-                print.println("Número inválido.");
+                print.println("Numero invalido.");
             }
             if (value != null && value <= 0) {
-                print.println("Número deve ser maior que zero.");
+                print.println("Numero deve ser maior que zero.");
                 value = null;
             }
         } while (value == null);
