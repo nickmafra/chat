@@ -19,10 +19,12 @@ public class PrintStreamScanner {
     private final PrintStream print;
     private final Scanner scanner;
 
+    private boolean printValorDigitado;
+
     public PrintStreamScanner(OutputStream out, InputStream in) {
         this.out = out;
         this.in = in;
-        this.print = new PrintStream(out);
+        this.print = new PrintStream(out, true);
         this.scanner = new Scanner(in);
     }
 
@@ -44,6 +46,10 @@ public class PrintStreamScanner {
 
     public Scanner getScanner() {
         return scanner;
+    }
+
+    public void setPrintValorDigitado(boolean printValorDigitado) {
+        this.printValorDigitado = printValorDigitado;
     }
 
     public void print(Object obj) {
@@ -68,16 +74,21 @@ public class PrintStreamScanner {
     public String getString(String msg, Object fb) {
         String value;
         do {
-            print.print(msg);
-            if (fb != null) {
-                print.print(" (" + fb + ")");
+            if (msg != null) {
+                print.print(msg);
+                if (fb != null) {
+                    print.print(" (" + fb + ")");
+                }
+                print.print(": ");
             }
-            print.print(": ");
             value = scanner.nextLine();
             if (fb != null && value.isEmpty()) {
                 value = fb.toString();
             }
         } while (value.isEmpty());
+        if (printValorDigitado) {
+            print.println(value);
+        }
         return value;
     }
 
