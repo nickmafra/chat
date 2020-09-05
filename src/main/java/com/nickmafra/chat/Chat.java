@@ -1,11 +1,9 @@
 package com.nickmafra.chat;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Chat {
@@ -33,6 +31,8 @@ public class Chat {
                 conectar();
             }
             conversar();
+        } catch (InterruptedIOException e) {
+            console.println("Conexão interrompida.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,7 +60,7 @@ public class Chat {
         socketOut = new PrintStream(socket.getOutputStream());
     }
 
-    private void conversar() {
+    private void conversar() throws InterruptedIOException {
         console.println("---Início da conversa---");
         while (!Thread.currentThread().isInterrupted()) {
             if (isHost) {
@@ -79,11 +79,16 @@ public class Chat {
         socketOut.println(textoOut);
     }
 
-    private void receber() {
+    private void receber() throws InterruptedIOException {
         console.println();
-        console.print("- Fulano: ");
-        String textoIn = socketIn.nextLine();
-        console.println(textoIn);
+        console.println("Aguarde a outra pessoa digitar...");
+        String textoIn;
+        try {
+            textoIn = socketIn.nextLine();
+        } catch (NoSuchElementException e) {
+            throw new InterruptedIOException();
+        }
+        console.println("- Fulano: " + textoIn);
     }
 
     public static void main(String[] args) {
