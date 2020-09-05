@@ -6,3 +6,5 @@ Chat feito em java para testar concorrência e comunicação usando sockets.
 - Compile o projeto executando `mvn clean install`
 - Execute o jar gerado dentro da pasta `target`
 usando o comando `java -jar CAMINHO_DO_JAR`
+
+![alt text](https://github.com/nickmafra/chat/blob/master/imgs/print.png?raw=true)
