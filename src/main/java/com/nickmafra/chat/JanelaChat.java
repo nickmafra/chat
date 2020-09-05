@@ -7,9 +7,10 @@ import java.util.function.Consumer;
 
 public class JanelaChat {
 
-    private final JFrame frame;
-    private final JTextArea textoSaida;
-    private final JTextField textoEntrada;
+    private JFrame frame;
+    private JPanel panel;
+    private JTextArea textoSaida;
+    private JTextField textoEntrada;
     private int width = 400;
     private int height = 600;
 
@@ -17,29 +18,28 @@ public class JanelaChat {
 
     public JanelaChat() {
         frame = new JFrame("Chat");
-        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        textoSaida = createTextoSaida();
-        textoSaida.setText("Bem vindo ao chat\n");
-        textoEntrada = new JTextField();
-        textoEntrada.setAction(new ActionPerformed(this::onEnter));
-        JPanel panel = createPanel(textoSaida, textoEntrada);
-        frame.add(panel);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        configurarComponentes();
     }
 
-    private static JTextArea createTextoSaida() {
-        JTextArea textoSaida = new JTextArea();
+    private void configurarComponentes() {
+        textoSaida = new JTextArea();
         textoSaida.setEditable(false);
         textoSaida.setBackground(Color.BLACK);
         textoSaida.setForeground(Color.GREEN);
-        return textoSaida;
-    }
 
-    private static JPanel createPanel(Component textoSaida, Component textoEntrada) {
-        JPanel panel = new JPanel(new BorderLayout());
+        JScrollPane scroll = new JScrollPane(textoSaida);
+        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        textoSaida.setText("Bem vindo ao chat\n");
+        textoEntrada = new JTextField();
+        textoEntrada.setAction(new ActionPerformed(this::onEnter));
+
+        panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         panel.add(textoEntrada, BorderLayout.SOUTH);
-        panel.add(textoSaida, BorderLayout.CENTER);
-        return panel;
+        panel.add(scroll, BorderLayout.CENTER);
+        frame.add(panel);
     }
 
     public JFrame getFrame() {
@@ -57,7 +57,7 @@ public class JanelaChat {
 
     private synchronized void onEnter(ActionEvent e) {
         if (consumerTextoDigitado != null) {
-            consumerTextoDigitado.accept(textoEntrada.getText());
+            consumerTextoDigitado.accept(textoEntrada.getText() + "\n");
             textoEntrada.setText("");
         }
     }
