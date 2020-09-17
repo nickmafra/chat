@@ -1,5 +1,7 @@
 package com.nickmafra.chat;
 
+import com.nickmafra.concurrent.PrintStreamScanner;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;

@@ -1,5 +1,8 @@
 package com.nickmafra.chat;
 
+import com.nickmafra.concurrent.StringConsumerOutputStream;
+import com.nickmafra.concurrent.StringConsumerPipe;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -11,7 +14,7 @@ public class JanelaAsyncChatMain {
         OutputStream out = new StringConsumerOutputStream(janelaChat::print);
         StringConsumerPipe pipe = new StringConsumerPipe();
 
-        janelaChat.setConsumerTextoDigitado(pipe::accept);
+        janelaChat.setConsumerTextoDigitado(pipe);
         janelaChat.start();
 
         AsyncChat asyncChat = new AsyncChat(out, pipe.getInputStream());
